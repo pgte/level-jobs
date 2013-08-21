@@ -2,8 +2,9 @@ var assert       = require('assert');
 var inherits     = require('util').inherits;
 var EventEmitter = require('events').EventEmitter;
 var Sublevel     = require('level-sublevel');
-var peek         = require('./peek');
 var stringify    = require('json-stringify-safe');
+var peek         = require('./peek');
+var timestamp    = require('./timestamp');
 
 exports = module.exports = Jobs;
 
@@ -40,18 +41,6 @@ inherits(Queue, EventEmitter);
 var Q = Queue.prototype;
 
 
-/// timestamp
-
-var lastTime;
-
-function timestamp() {
-  var t = Date.now() * 1024 + Math.floor(Math.random() * 1024);
-  if (lastTime) while (t <= lastTime) t ++;
-  lastTime = t;
-  return t;
-}
-
-
 /// push
 
 Q.push = function push(payload, cb) {
@@ -84,9 +73,7 @@ function start(q) {
 
 function maybeFlush(q) {
   if (! q._starting && ! q._flushing) flush(q);
-  else {
-    q._needsFlush = true;
-  }
+  else q._needsFlush = true;
 }
 
 /// flush

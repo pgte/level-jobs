@@ -10,11 +10,11 @@ rimraf.sync(dbPath);
 var db = level(dbPath);
 
 test('infinity concurrency', function(t) {
-  var max = 1;
+  var max = 10;
   var queue = Jobs(db, worker);
 
-  for (var i = 0 ; i < max ; i ++) {
-    queue.push({n:1}, pushed);
+  for (var i = 1 ; i <= max ; i ++) {
+    queue.push({n:i}, pushed);
   }
 
   function pushed(err) {
