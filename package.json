@@ -1,0 +1,32 @@
+{
+  "name": "level-jobs",
+  "version": "0.0.1",
+  "description": "Job Queue in LevelDB",
+  "main": "index.js",
+  "scripts": {
+    "test": "tap tests/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pgte/level-jobs.git"
+  },
+  "keywords": [
+    "leveldb",
+    "job",
+    "queue"
+  ],
+  "author": "pgte",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pgte/level-jobs/issues"
+  },
+  "dependencies": {
+    "json-stringify-safe": "~5.0.0",
+    "level-sublevel": "~5.0.1"
+  },
+  "devDependencies": {
+    "level": "~0.14.0",
+    "tap": "~0.4.4",
+    "rimraf": "~2.2.2"
+  }
+}
