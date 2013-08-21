@@ -129,7 +129,7 @@ function flush(q) {
         else {
           q._pending.del(key, function(_err) {
             if (err) q.emit('error', _err);
-            if (q._concurrency < q._maxConcurrency) flush(q);
+            flush(q);
           });
         }
       }
@@ -145,7 +145,7 @@ function flush(q) {
 
       function backToWorkAfterError(err) {
         if (err) q.emit('error', err);
-        if (q._concurrency < q._maxConcurrency) flush(q);
+        flush(q);
       }
     }
   }
