@@ -8,7 +8,6 @@ var dbPath = __dirname + '/db';
 test('infinity concurrency', function(t) {
 
   rimraf.sync(dbPath);
-
   var db = level(dbPath);
 
   var max = 10;
@@ -38,7 +37,45 @@ test('infinity concurrency', function(t) {
   queue.on('drain', function() {
     if (count == max) {
       t.equal(cbs.length, 0);
-      t.end();
+      db.once('closed', t.end.bind(t));
+      db.close();
+    }
+  });
+});
+
+test('concurrency of 1', function(t) {
+
+  rimraf.sync(dbPath);
+  var db = level(dbPath);
+
+  var max = 10;
+  var concurrency = 1;
+  var queue = Jobs(db, worker, concurrency);
+
+  for (var i = 1 ; i <= max ; i ++) {
+    queue.push({n:i}, pushed);
+  }
+
+  function pushed(err) {
+    if (err) throw err;
+  }
+
+  var count = 0;
+  var working = false;
+  function worker(work, cb) {
+    t.notOk(working, 'should not be concurrent');
+    count ++;
+    working = true;
+    t.equal(work.n, count);
+    setTimeout(function() {
+      working = false;
+      cb();
+    }, 100);
+  };
+
+  queue.on('drain', function() {
+    if (count == max) {
+      db.once('closed', t.end.bind(t));
       db.close();
     }
   });
