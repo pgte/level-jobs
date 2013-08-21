@@ -5,11 +5,12 @@ var Jobs   = require('../');
 
 var dbPath = __dirname + '/db';
 
-rimraf.sync(dbPath);
-
-var db = level(dbPath);
-
 test('infinity concurrency', function(t) {
+
+  rimraf.sync(dbPath);
+
+  var db = level(dbPath);
+
   var max = 10;
   var queue = Jobs(db, worker);
 
@@ -38,11 +39,7 @@ test('infinity concurrency', function(t) {
     if (count == max) {
       t.equal(cbs.length, 0);
       t.end();
+      db.close();
     }
   });
-});
-
-test('closes the db', function(t) {
-  db.close();
-  t.end();
 });
