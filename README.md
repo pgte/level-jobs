@@ -2,6 +2,8 @@
 
 > Job Queue in LevelDB for Node.js
 
+[![Build Status](https://travis-ci.org/pgte/level-jobs.png?branch=master)](https://travis-ci.org/pgte/level-jobs)
+
 Define workers Persist work units. Work units are retried when failed.
 
 ## Install
