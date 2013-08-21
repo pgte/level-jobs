@@ -113,7 +113,7 @@ function flush(q) {
     function transfered(err) {
       if (err) {
         q._concurrency --;
-        q.emit('error');
+        q.emit('error', err);
       } else {
         run(q, JSON.parse(work), ran);
       }
