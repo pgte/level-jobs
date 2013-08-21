@@ -127,12 +127,14 @@ function flush(q) {
 
         if (err) handleRunError();
         else {
-          q._pending.del(key, function(_err) {
-            if (err) q.emit('error', _err);
-            flush(q);
-          });
+          q._pending.del(key, deletedPending);
         }
       }
+    }
+
+    function deletedPending(_err) {
+      if (err) q.emit('error', _err);
+      flush(q);
     }
 
     function handleRunError() {
@@ -148,6 +150,7 @@ function flush(q) {
       if (err) q.emit('error', err);
       flush(q);
     }
+
   }
 }
 
