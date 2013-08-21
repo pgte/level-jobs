@@ -112,7 +112,6 @@ test('retries on error', function(t) {
   };
 
   queue.on('drain', function() {
-    console.log('drain');
     if (count == max * 2) {
       t.equal(queue._concurrency, 0);
       db.once('closed', t.end.bind(t));
@@ -120,5 +119,3 @@ test('retries on error', function(t) {
     }
   });
 });
-
-function xtest() {}
