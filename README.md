@@ -7,6 +7,7 @@
 * Define worker functions
 * Persist work units
 * Work units are retried when failed
+* Define maximum concurrency
 
 ## Install
 
