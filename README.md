@@ -4,7 +4,9 @@
 
 [![Build Status](https://travis-ci.org/pgte/level-jobs.png?branch=master)](https://travis-ci.org/pgte/level-jobs)
 
-Define workers Persist work units. Work units are retried when failed.
+* Define worker functions
+* Persist work units
+* Work units are retried when failed
 
 ## Install
 
