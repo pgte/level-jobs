@@ -37,6 +37,7 @@ test('infinite concurrency', function(t) {
   queue.on('drain', function() {
     if (count == max) {
       t.equal(cbs.length, 0);
+      t.equal(queue._concurrency, 0);
       db.once('closed', t.end.bind(t));
       db.close();
     }
@@ -75,6 +76,7 @@ test('concurrency of 1', function(t) {
 
   queue.on('drain', function() {
     if (count == max) {
+      t.equal(queue._concurrency, 0);
       db.once('closed', t.end.bind(t));
       db.close();
     }
@@ -112,6 +114,7 @@ test('retries on error', function(t) {
   queue.on('drain', function() {
     console.log('drain');
     if (count == max * 2) {
+      t.equal(queue._concurrency, 0);
       db.once('closed', t.end.bind(t));
       db.close();
     }
