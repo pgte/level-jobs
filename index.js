@@ -133,20 +133,20 @@ function flush(q) {
           });
         }
       }
+    }
 
-      function handleRunError() {
-        // Error handling
-        q._needsDrain = true;
-        q._db.batch([
-          { type: 'del', key: key, prefix: q._pending },
-          { type: 'put', key: key, value: work, prefix: q._work }
-        ], backToWorkAfterError);
-      }
+    function handleRunError() {
+      // Error handling
+      q._needsDrain = true;
+      q._db.batch([
+        { type: 'del', key: key, prefix: q._pending },
+        { type: 'put', key: key, value: work, prefix: q._work }
+      ], backToWorkAfterError);
+    }
 
-      function backToWorkAfterError(err) {
-        if (err) q.emit('error', err);
-        flush(q);
-      }
+    function backToWorkAfterError(err) {
+      if (err) q.emit('error', err);
+      flush(q);
     }
   }
 }
