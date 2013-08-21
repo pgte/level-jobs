@@ -5,7 +5,7 @@ var Jobs   = require('../');
 
 var dbPath = __dirname + '/db';
 
-test('infinity concurrency', function(t) {
+test('infinite concurrency', function(t) {
 
   rimraf.sync(dbPath);
   var db = level(dbPath);
@@ -80,3 +80,42 @@ test('concurrency of 1', function(t) {
     }
   });
 });
+
+test('retries on error', function(t) {
+  rimraf.sync(dbPath);
+  var db = level(dbPath);
+
+  var max = 10;
+  var queue = Jobs(db, worker);
+
+  for (var i = 1 ; i <= max ; i ++) {
+    queue.push({n:i}, pushed);
+  }
+
+  function pushed(err) {
+    if (err) throw err;
+  }
+
+  var erroredOn = {};
+  var count = 0;
+  function worker(work, cb) {
+    count ++;
+    if (!erroredOn[work.n]) {
+      erroredOn[work.n] = true;
+      cb(new Error('oops!'));
+    } else {
+      working = true;
+      cb();
+    }
+  };
+
+  queue.on('drain', function() {
+    console.log('drain');
+    if (count == max * 2) {
+      db.once('closed', t.end.bind(t));
+      db.close();
+    }
+  });
+});
+
+function xtest() {}

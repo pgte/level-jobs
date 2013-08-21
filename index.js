@@ -30,6 +30,7 @@ function Queue(db, worker, maxConcurrency) {
   // flags
   this._starting   = true;
   this._flushing   = false;
+  this._peeking    = false;
   this._needsFlush = false;
   this._needsDrain = true;
 
@@ -49,7 +50,10 @@ Q.push = function push(payload, cb) {
   this._work.put(timestamp(), stringify(payload), put);
 
   function put(err) {
-    cb(err);
+    if (err) {
+      if (cb) cb(err);
+      else q.emit('error', err);
+    }
     maybeFlush(q);
   }
 };
@@ -79,15 +83,21 @@ function maybeFlush(q) {
 /// flush
 
 function flush(q) {
-  q._flushing = true;
-  peek(q._work, poke);
+  if (q._concurrency < q._maxConcurrency && ! q._peeking) {
+    q._peeking  = true;
+    q._flushing = true;
+    peek(q._work, poke);
+  }
 
   function poke(err, key, work) {
+    q._peeking = false;
+    var done = false;
+
     if (key) {
       q._concurrency ++;
       q._db.batch([
-        {type: 'del', key: key, prefix: q._work},
-        {type: 'put', key: key, value: work}
+        { type: 'del', key: key, prefix: q._work },
+        { type: 'put', key: key, value: work, prefix: q._pending }
       ], transfered);
     } else {
       q._flushing = false;
@@ -105,31 +115,45 @@ function flush(q) {
         q._concurrency --;
         q.emit('error');
       } else {
-        run(q, key, JSON.parse(work));
+        run(q, JSON.parse(work), ran);
       }
-      if (q._concurrency < q._maxConcurrency) flush(q);
+      flush(q);
+    }
+
+    function ran(err) {
+      if (! done) {
+        done = true;
+        q._concurrency --;
+
+        if (err) handleRunError();
+        else {
+          q._pending.del(key, function(_err) {
+            if (err) q.emit('error', _err);
+            if (q._concurrency < q._maxConcurrency) flush(q);
+          });
+        }
+      }
+
+      function handleRunError() {
+        // Error handling
+        q._needsDrain = true;
+        q._db.batch([
+          { type: 'del', key: key, prefix: q._pending },
+          { type: 'put', key: key, value: work, prefix: q._work }
+        ], backToWorkAfterError);
+      }
+
+      function backToWorkAfterError(err) {
+        if (err) q.emit('error', err);
+        if (q._concurrency < q._maxConcurrency) flush(q);
+      }
     }
   }
-
 }
 
 
 /// run
 
-function run(q, key, work) {
-  var done = false;
-  q._worker(work, ran);
-
-  function ran(err) {
-    if (! done) {
-      done = true;
-      q._concurrency --;
-      q._db.del(key, function(err) {
-        if (err) q.emit('error', err);
-        flush(q);
-      });
-      if (err) q.push(work);
-    }
-  }
+function run(q, work, cb) {
+  q._worker(work, cb);
 }
-
