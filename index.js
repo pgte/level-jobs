@@ -68,7 +68,7 @@ function start(q) {
 
   function done() {
     q._starting = false;
-    flush(q);
+    maybeFlush(q);
   }
 }
 
