@@ -53,7 +53,7 @@ Q.push = function push(payload, cb) {
     if (err) {
       if (cb) cb(err);
       else q.emit('error', err);
-    } else cb();
+    } else if (cb) cb();
     maybeFlush(q);
   }
 };
