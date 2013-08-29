@@ -119,3 +119,19 @@ test('retries on error', function(t) {
     }
   });
 });
+
+test('works with no push callback', function(t) {
+  rimraf.sync(dbPath);
+  var db = level(dbPath);
+  var jobs = Jobs(db, worker);
+
+  function worker (payload, done) {
+    done();
+    process.nextTick(function() {
+      db.once('closed', t.end.bind(t));
+      db.close();
+    });
+  };                                                                                                                                            
+
+  jobs.push({ foo: 'bar' });
+});
