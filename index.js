@@ -41,9 +41,6 @@ function Queue(db, worker, options) {
   this._worker         = worker;
   this._concurrency    = 0;
 
-  // retry backoff
-  this._errorBackoff   = backoff.exponential
-
   // flags
   this._starting   = true;
   this._flushing   = false;
