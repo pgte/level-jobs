@@ -62,6 +62,24 @@ var maxConcurrency = 2;
 var queue = Jobs(db, worker, maxConcurrency);
 ```
 
+### More Options
+
+As an alternative the third argument can be an options object with these defaults:
+
+```javascript
+var options = {
+  maxConcurrency: Infinity,
+  maxRetries:     10,
+  backoff: {
+    randomisationFactor: 0,
+    initialDelay: 10,
+    maxDelay: 300
+  }
+};
+
+var queue = Jobs(db, worker, options);
+```
+
 ### Push work to the queue
 
 ```javascript

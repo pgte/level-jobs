@@ -131,7 +131,25 @@ test('works with no push callback', function(t) {
       db.once('closed', t.end.bind(t));
       db.close();
     });
-  };                                                                                                                                            
+  };
+
+  jobs.push({ foo: 'bar' });
+});
+
+test('has exponential backoff in case of error', function(t) {
+  rimraf.sync(dbPath);
+  var db = level(dbPath);
+  var jobs = Jobs(db, worker);
+
+  function worker (payload, done) {
+    done(new Error('Oh no!'));
+  };
+
+  jobs.once('error', function(err) {
+    t.equal(err.message, 'max retries reached');
+    db.once('closed', t.end.bind(t));
+    db.close();
+  });
 
   jobs.push({ foo: 'bar' });
 });
