@@ -85,8 +85,31 @@ var queue = Jobs(db, worker, options);
 ```javascript
 var payload = {what: 'ever'};
 
-queue.push(payload, function(err) {
+var jobId = queue.push(payload, function(err) {
   if (err) console.error('Error pushing work into the queue', err.stack);
+});
+```
+
+### Delete pending job
+
+(Only works for jobs that haven't started yet!)
+
+```javascript
+queue.del(jobId, function(err) {
+  if (err) console.error('Error deleting job', err.stack);
+});
+```
+
+### Traverse pending jobs
+
+(Only works for jobs that haven't started yet!)
+
+```javascript
+var stream = queue.readStream();
+stream.on('data', function(d) {
+  var jobId = d.key;
+  var work = d.value;
+  console.log('pending job id: %s, work: %j', jobId, work);
 });
 ```
 

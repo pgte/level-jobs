@@ -1,6 +1,7 @@
 var test   = require('tap').test;
 var rimraf = require('rimraf');
 var level  = require('level');
+var async  = require('async');
 var Jobs   = require('../');
 
 var dbPath = __dirname + '/db';
@@ -152,4 +153,82 @@ test('has exponential backoff in case of error', function(t) {
   });
 
   jobs.push({ foo: 'bar' });
+});
+
+test('can delete job', function(t) {
+  rimraf.sync(dbPath);
+  var db = level(dbPath);
+  var jobs = Jobs(db, worker);
+
+  var processed = 0;
+
+  function worker (payload, done) {
+    processed += 1;
+    t.ok(processed <= 1, 'worker is not called 2 times');
+
+    jobs.del(job2Id, function(err) {
+      if (err) throw err;
+      done();
+    });
+
+    setTimeout(function() {
+      db.once('closed', t.end.bind(t));
+      db.close();
+    }, 500);
+  };
+
+  var job1Id = jobs.push({ foo: 'bar', seq: 1 });
+  t.type(job1Id, 'number');
+  var job2Id = jobs.push({ foo: 'bar', seq: 2 });
+  t.type(job2Id, 'number');
+});
+
+test('can get read stream', function(t) {
+  rimraf.sync(dbPath);
+  var db = level(dbPath);
+  var jobs = Jobs(db, worker);
+
+  var works = [
+    { foo: 'bar', seq: 1 },
+    { foo: 'bar', seq: 2 },
+    { foo: 'bar', seq: 3 }
+  ];
+
+  var workIds = [];
+
+  async.each(works, insert, doneInserting);
+
+  function insert(work, done) {
+    workIds.push(jobs.push(work, done).toString());
+  }
+
+  function doneInserting(err) {
+    if (err) throw err;
+
+    var rs = jobs.readStream();
+    rs.on('data', onData);
+
+    var seq = -1;
+    function onData(d) {
+      seq += 1;
+
+      var id = d.key;
+      var work = d.value;
+      t.equal(id, workIds[seq]);
+      var expected = works[seq];
+
+      t.deepEqual(work, expected);
+      if (seq == works.length - 1) {
+        process.nextTick(function() {
+          db.once('closed', t.end.bind(t));
+          db.close();
+        });
+      }
+    }
+  }
+
+
+  function worker (payload, done) {
+    // do nothing
+  };
 });

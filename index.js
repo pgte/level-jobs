@@ -1,7 +1,6 @@
 var assert       = require('assert');
 var inherits     = require('util').inherits;
 var EventEmitter = require('events').EventEmitter;
-var extend       = require('util')._extend;
 var Sublevel     = require('level-sublevel');
 var stringify    = require('json-stringify-safe');
 var backoff      = require('backoff');
@@ -61,7 +60,10 @@ var Q = Queue.prototype;
 Q.push = function push(payload, cb) {
   var q = this;
   q._needsDrain = true;
-  this._work.put(timestamp(), stringify(payload), put);
+  var id = timestamp();
+  this._work.put(id, stringify(payload), put);
+
+  return id;
 
   function put(err) {
     if (err) {
@@ -70,7 +72,25 @@ Q.push = function push(payload, cb) {
     } else if (cb) cb();
     maybeFlush(q);
   }
+
 };
+
+
+/// del
+
+Q.del = function del(id, cb) {
+  this._work.del(id, cb);
+};
+
+
+/// readStream
+
+Q.readStream = function readStream(options) {
+  if (! options) options = {};
+  options = xtend({}, options);
+  options.valueEncoding = 'json';
+  return this._work.createReadStream(options);
+}
 
 
 /// start

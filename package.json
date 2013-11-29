@@ -29,6 +29,7 @@
   "devDependencies": {
     "level": "~0.14.0",
     "tap": "~0.4.4",
-    "rimraf": "~2.2.2"
+    "rimraf": "~2.2.2",
+    "async": "~0.2.9"
   }
 }
