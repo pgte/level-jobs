@@ -4,7 +4,7 @@
   "description": "Job Queue in LevelDB",
   "main": "index.js",
   "scripts": {
-    "test": "tap tests/test.js"
+    "test": "tap tests/test.js tests/client.js"
   },
   "repository": {
     "type": "git",
