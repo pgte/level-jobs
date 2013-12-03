@@ -5,6 +5,7 @@ var Sublevel     = require('level-sublevel');
 var stringify    = require('json-stringify-safe');
 var backoff      = require('backoff');
 var xtend        = require('xtend');
+var Hooks        = require('level-hooks');
 var peek         = require('./peek');
 var timestamp    = require('./timestamp');
 
@@ -28,6 +29,7 @@ function Jobs(db, worker, options) {
 }
 
 function Queue(db, worker, options) {
+  var q = this;
   EventEmitter.call(this);
 
   if (typeof options == 'number') options = { maxConcurrency: options };
@@ -46,6 +48,13 @@ function Queue(db, worker, options) {
   this._peeking    = false;
   this._needsFlush = false;
   this._needsDrain = true;
+
+  // hooks
+  Hooks(this._work);
+  this._work.hooks.post(function() {
+    maybeFlush(q)
+  });
+
 
   start(this);
 }
@@ -70,7 +79,6 @@ Q.push = function push(payload, cb) {
       if (cb) cb(err);
       else q.emit('error', err);
     } else if (cb) cb();
-    maybeFlush(q);
   }
 
 };

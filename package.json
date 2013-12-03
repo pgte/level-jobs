@@ -24,7 +24,8 @@
     "json-stringify-safe": "~5.0.0",
     "level-sublevel": "~5.0.1",
     "backoff": "~2.3.0",
-    "xtend": "~2.0.6"
+    "xtend": "~2.0.6",
+    "level-hooks": "~4.4.4"
   },
   "devDependencies": {
     "level": "~0.14.0",
