@@ -3,6 +3,7 @@
   "version": "0.4.0",
   "description": "Job Queue in LevelDB",
   "main": "index.js",
+  "browser": "client.js",
   "scripts": {
     "test": "tap tests/test.js tests/client.js"
   },
