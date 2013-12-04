@@ -1,6 +1,6 @@
 {
   "name": "level-jobs",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Job Queue in LevelDB",
   "main": "index.js",
   "scripts": {
@@ -16,6 +16,10 @@
     "queue"
   ],
   "author": "pgte",
+  "contributors": [
+    "Pedro Teixeira <pedro.teixeira@gmail.com>",
+    "Tim Oxley <secoif@gmail.com>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/pgte/level-jobs/issues"
