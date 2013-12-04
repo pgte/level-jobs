@@ -123,7 +123,7 @@ A queue object emits the following event:
 
 ## Client isolated API
 
-If you simply want a pure queue client that is only able to push jobs into the queque, you can use `level-jobs/client` like this:
+If you simply want a pure queue client that is only able to push jobs into the queue, you can use `level-jobs/client` like this:
 
 ```javascript
 var QueueClient = require('level-jobs/client');
