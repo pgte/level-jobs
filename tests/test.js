@@ -34,7 +34,6 @@ test('infinite concurrency', function(t) {
   function callback() {
     while(cbs.length) cbs.shift()();
   }
-
   queue.on('drain', function() {
     if (count == max) {
       t.equal(cbs.length, 0);
