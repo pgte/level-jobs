@@ -7,19 +7,22 @@ var ClientJobs = require('../client');
 
 var dbPath = __dirname + '/db';
 
-test('client', function(t) {
-
+test('client', {timeout: 2000}, function(t) {
   rimraf.sync(dbPath);
   var db = level(dbPath);
 
   var max = 10;
   var queue = Jobs(db, worker);
 
-  var clientQueue = ClientJobs(db);
-
-  for (var i = 1 ; i <= max ; i ++) {
-    clientQueue.push({n:i}, pushed);
-  }
+  // Ensure client runs later
+  queue.once('drain', function() {
+    process.nextTick(function() {
+      var clientQueue = ClientJobs(db);
+      for (var i = 1 ; i <= max ; i ++) {
+        clientQueue.push({n:i}, pushed);
+      }
+    });
+  });
 
   function pushed(err) {
     if (err) throw err;
@@ -46,8 +49,7 @@ test('client', function(t) {
       db.close();
     }
   });
-
-})
+});
 
 
 test('can delete job', function(t) {
@@ -62,7 +64,7 @@ test('can delete job', function(t) {
     processed += 1;
     t.ok(processed <= 1, 'worker is not called 2 times');
 
-    jobs.del(job2Id, function(err) {
+    clientQueue.del(job2Id, function(err) {
       if (err) throw err;
       done();
     });

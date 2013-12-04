@@ -6,19 +6,23 @@ var stringify    = require('json-stringify-safe');
 var xtend        = require('xtend');
 var timestamp    = require('./timestamp');
 
-exports = module.exports = function Jobs(db, worker, options) {
+exports = module.exports = ClientQueue;
+
+function ClientQueue(db, worker, options) {
   assert.equal(typeof db, 'object', 'need db');
   assert.equal(arguments.length, 1, 'cannot define worker on client');
 
   return new Queue(db);
-};
+}
+
+ClientQueue.Queue = Queue
 
 function Queue(db) {
   EventEmitter.call(this);
 
   this._db = db = Sublevel(db);
   this._work = db.sublevel('work');
-};
+}
 
 inherits(Queue, EventEmitter);
 
@@ -39,13 +43,13 @@ Q.push = function push(payload, cb) {
       else q.emit('error', err);
     } else if (cb) cb();
   };
-};
+}
 
 /// del
 
 Q.del = function del(id, cb) {
   this._work.del(id, cb);
-};
+}
 
 /// readStream
 
