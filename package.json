@@ -19,7 +19,8 @@
   "author": "pgte",
   "contributors": [
     "Pedro Teixeira <pedro.teixeira@gmail.com>",
-    "Tim Oxley <secoif@gmail.com>"
+    "Tim Oxley <secoif@gmail.com>",
+    "Lars-Magnus Skog <ralphtheninja@riseup.net>"
   ],
   "license": "MIT",
   "bugs": {
@@ -33,7 +34,7 @@
     "level-hooks": "~4.4.4"
   },
   "devDependencies": {
-    "level": "~0.14.0",
+    "level": "~0.18.0",
     "tap": "~0.4.4",
     "rimraf": "~2.2.2",
     "async": "~0.2.9"
