@@ -6,6 +6,7 @@ var stringify    = require('json-stringify-safe');
 var backoff      = require('backoff');
 var xtend        = require('xtend');
 var Hooks        = require('level-hooks');
+var levelWs      = require('level-ws');
 var peek         = require('./peek');
 var timestamp    = require('./timestamp');
 
@@ -39,8 +40,8 @@ function Queue(db, worker, options) {
 
   this._options        = options;
   this._db             = db = Sublevel(db);
-  this._work           = db.sublevel('work');
-  this._pending        = db.sublevel('pending');
+  this._work           = levelWs(db.sublevel('work'));
+  this._pending        = levelWs(db.sublevel('pending'));
   this._worker         = worker;
   this._concurrency    = 0;
 
