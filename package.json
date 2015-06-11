@@ -31,7 +31,7 @@
     "json-stringify-safe": "~5.0.0",
     "level-hooks": "~4.4.4",
     "level-sublevel": "~5.0.1",
-    "level-write-stream": "^1.0.0",
+    "level-ws": "^0.0.0",
     "xtend": "~2.0.6"
   },
   "devDependencies": {
