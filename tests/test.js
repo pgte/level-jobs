@@ -231,3 +231,85 @@ test('can get read stream', function(t) {
     // do nothing
   };
 });
+
+test('doesn\'t skip past failed tasks', function(t) {
+  rimraf.sync(dbPath);
+  var db = level(dbPath);
+
+  var max = 10;
+  var queue = Jobs(db, worker, 1);
+
+  for (var i = 1; i <= max; i++) {
+    queue.push({ n: i }, pushed);
+  }
+
+  function pushed(err) {
+    if (err) throw err;
+  }
+
+  var erroredOn = {};
+  var count = 0;
+  var next = 1;
+  function worker(work, cb) {
+    // fail every other one
+    if (work.n % 2 && !erroredOn[work.n]) {
+      erroredOn[work.n] = true;
+      cb(new Error('oops!'));
+    } else {
+      count++;
+      working = true;
+      t.equal(next++, work.n)
+      cb();
+    }
+  };
+
+  queue.on('drain', function() {
+    if (count === max) {
+      t.equal(queue._concurrency, 0);
+      db.once('closed', t.end.bind(t));
+      process.nextTick(function() {
+        db.close();
+      });
+    }
+  });
+});
+
+test('continues after close and reopen', function(t) {
+  rimraf.sync(dbPath);
+  var db = level(dbPath);
+
+  var max = 10;
+  var restartAfter = max / 2 | 0
+  var queue = Jobs(db, worker, 1)
+
+  for (var i = 1; i <= max; i++) {
+    queue.push({ n: i }, pushed);
+  }
+
+  function pushed(err) {
+    if (err) throw err;
+  }
+
+  var count = 0;
+  function worker(work, cb) {
+    count++;
+    t.equal(work.n, count);
+    cb();
+
+    if (count === restartAfter) {
+      db.close(function () {
+        db = level(dbPath)
+        queue = Jobs(db, worker, 1)
+        queue.on('drain', function() {
+          if (count === max) {
+            t.equal(queue._concurrency, 0);
+            db.once('closed', t.end.bind(t));
+            process.nextTick(function() {
+              db.close();
+            });
+          }
+        });
+      })
+    }
+  };
+});
