@@ -267,7 +267,9 @@ test('doesn\'t skip past failed tasks', function(t) {
     if (count === max) {
       t.equal(queue._concurrency, 0);
       db.once('closed', t.end.bind(t));
-      db.close();
+      process.nextTick(function() {
+        db.close();
+      });
     }
   });
 });
@@ -302,7 +304,9 @@ test('continues after close and reopen', function(t) {
           if (count === max) {
             t.equal(queue._concurrency, 0);
             db.once('closed', t.end.bind(t));
-            db.close();
+            process.nextTick(function() {
+              db.close();
+            });
           }
         });
       })
