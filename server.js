@@ -6,6 +6,7 @@ var stringify    = require('json-stringify-safe');
 var backoff      = require('backoff');
 var xtend        = require('xtend');
 var Hooks        = require('level-hooks');
+var WriteStream  = require('level-write-stream');
 var peek         = require('./peek');
 var timestamp    = require('./timestamp');
 
@@ -40,6 +41,7 @@ function Queue(db, worker, options) {
   this._options        = options;
   this._db             = db = Sublevel(db);
   this._work           = db.sublevel('work');
+  this._workWriteStream = WriteStream(this._work);
   this._pending        = db.sublevel('pending');
   this._worker         = worker;
   this._concurrency    = 0;
@@ -68,9 +70,9 @@ var Q = Queue.prototype;
 /// start
 
 function start(q) {
-  var ws = q._work.createWriteStream();
+  var ws = q._workWriteStream();
   q._pending.createReadStream().pipe(ws);
-  ws.once('close', done);
+  ws.once('finish', done);
 
   function done() {
     q._starting = false;

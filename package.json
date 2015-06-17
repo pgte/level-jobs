@@ -27,16 +27,17 @@
     "url": "https://github.com/pgte/level-jobs/issues"
   },
   "dependencies": {
-    "json-stringify-safe": "~5.0.0",
-    "level-sublevel": "~5.0.1",
     "backoff": "~2.3.0",
-    "xtend": "~2.0.6",
-    "level-hooks": "~4.4.4"
+    "json-stringify-safe": "~5.0.0",
+    "level-hooks": "~4.5.0",
+    "level-sublevel": "~6.4.6",
+    "level-write-stream": "~1.0.0",
+    "xtend": "~2.0.6"
   },
   "devDependencies": {
-    "level": "~0.18.0",
+    "level": "~1.1.0",
     "tap": "~0.4.4",
     "rimraf": "~2.2.2",
-    "async": "~0.2.9"
+    "async": "*"
   }
 }

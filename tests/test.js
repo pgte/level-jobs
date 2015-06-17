@@ -39,6 +39,7 @@ test('infinite concurrency', function(t) {
       t.equal(cbs.length, 0);
       t.equal(queue._concurrency, 0);
       db.once('closed', t.end.bind(t));
+      console.log('CLOSING');
       db.close();
     }
   });
