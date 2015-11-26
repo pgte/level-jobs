@@ -119,6 +119,7 @@ A queue object emits the following event:
 
 * `drain` — when there are no more jobs pending. Also happens on startup after consuming the backlog work units.
 * `error` - when something goes wrong.
+* `retry` - when a job is retried because something goes wrong.
 
 
 ## Client isolated API

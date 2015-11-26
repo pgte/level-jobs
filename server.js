@@ -150,6 +150,7 @@ function flush(q) {
       errorBackoff.failAfter(q._options.maxRetries);
 
       errorBackoff.on('ready', function() {
+        q.emit('retry', err);
         run(q, JSON.parse(work), ranAgain);
       });
 

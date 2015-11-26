@@ -121,6 +121,25 @@ test('retries on error', function(t) {
   });
 });
 
+test('emits retry event on retry', function(t) {
+  rimraf.sync(dbPath);
+  var db = level(dbPath);
+  var queue = Jobs(db, worker);
+
+  queue.on('error', Function());
+
+  queue.once('retry', function(err) {
+    db.once('closed', t.end.bind(t));
+    db.close();
+  });
+
+  function worker(work, cb) {
+    cb(new Error('oops!'));
+  };
+
+  queue.push({ foo: 'bar' });
+});
+
 test('works with no push callback', function(t) {
   rimraf.sync(dbPath);
   var db = level(dbPath);
