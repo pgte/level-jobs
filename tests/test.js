@@ -6,6 +6,21 @@ var Jobs   = require('../');
 
 var dbPath = __dirname + '/db';
 
+test('passes job id into worker fn', function(t) {
+  rimraf.sync(dbPath);
+  var db = level(dbPath);
+
+  var queue = Jobs(db, worker);
+  var jobId = queue.push({foo: 'bar'}, t.ifError.bind(t));
+
+  function worker(id, work, cb) {
+    t.equal(id, jobId + '');
+
+    db.once('closed', t.end.bind(t));
+    db.close();
+  };
+});
+
 test('infinite concurrency', function(t) {
 
   rimraf.sync(dbPath);
