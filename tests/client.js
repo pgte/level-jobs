@@ -15,7 +15,7 @@ test('can insert and delete job', function(t) {
   var clientQueue = ClientJobs(db);
   var processed = 0;
 
-  function worker (payload, done) {
+  function worker (id, payload, done) {
     processed += 1;
     t.ok(processed <= 1, 'worker is not called 2 times');
 
