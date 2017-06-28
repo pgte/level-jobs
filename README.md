@@ -104,12 +104,12 @@ queue.del(jobId, function(err) {
 });
 ```
 
-### Traverse pending jobs
+### Traverse jobs
 
-(Only works for jobs that haven't started yet!)
+`queue.pendingStream()` emits queued jobs. `queue.runningStream()` emits currently running jobs.
 
 ```javascript
-var stream = queue.readStream();
+var stream = queue.pendingStream();
 stream.on('data', function(d) {
   var jobId = d.key;
   var work = d.value;

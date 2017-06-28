@@ -21,6 +21,7 @@ function Queue(db) {
   EventEmitter.call(this);
 
   this._db = db = Sublevel(db);
+  this._pending = db.sublevel('pending');
   this._work = db.sublevel('work');
 }
 
@@ -51,11 +52,16 @@ Q.del = function del(id, cb) {
   this._work.del(id, cb);
 }
 
-/// readStream
+Q.pendingStream = function pendingStream(options) {
+  if (!options) options = {};
+  else options = xtend({}, options);
+  options.valueEncoding = 'json';
+  return this._pending.createReadStream(options);
+};
 
-Q.readStream = function readStream(options) {
-  if (! options) options = {};
-  options = xtend({}, options);
+Q.runningStream = function runningStream(options) {
+  if (!options) options = {};
+  else options = xtend({}, options);
   options.valueEncoding = 'json';
   return this._work.createReadStream(options);
 };
