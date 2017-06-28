@@ -1,6 +1,6 @@
 {
   "name": "level-jobs",
-  "version": "0.7.0",
+  "version": "1.0.0",
   "description": "Job Queue in LevelDB",
   "main": "index.js",
   "browser": "client.js",
@@ -20,7 +20,10 @@
   "contributors": [
     "Pedro Teixeira <pedro.teixeira@gmail.com>",
     "Tim Oxley <secoif@gmail.com>",
-    "Lars-Magnus Skog <ralphtheninja@riseup.net>"
+    "Lars-Magnus Skog <ralphtheninja@riseup.net>",
+    "Jannis Redmann <mail@jannisr.de>",
+    "Ash",
+    "Mark Vayngrib <mark@tradle.io>"
   ],
   "license": "MIT",
   "bugs": {
