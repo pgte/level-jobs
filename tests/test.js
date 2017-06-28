@@ -217,7 +217,7 @@ test('can delete job', function(t) {
   t.type(job2Id, 'number');
 });
 
-test('can get read stream', function(t) {
+test('can get runningStream & pendingStream', function(t) {
   rimraf.sync(dbPath);
   var db = level(dbPath);
   var jobs = Jobs(db, worker);
@@ -239,8 +239,8 @@ test('can get read stream', function(t) {
   function doneInserting(err) {
     if (err) throw err;
 
-    var rs = jobs.readStream();
-    rs.on('data', onData);
+    jobs.runningStream().on('data', onData);
+    jobs.pendingStream().on('data', onData);
 
     var seq = -1;
     function onData(d) {
