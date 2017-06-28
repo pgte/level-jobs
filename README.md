@@ -35,12 +35,16 @@ var Jobs = require('level-jobs');
 This function will take care of a work unit.
 
 ```javascript
-function worker(payload, cb) {
+function worker(id, payload, cb) {
   doSomething(cb);
 }
 ```
 
-This function gets 2 arguments: one is the payload of the work unit and the other is the callback function that must be called when the work is done.
+This function gets 3 arguments:
+
+- `id` uniquely identifies a job to be executed.
+- `payload` contains everyting `worker` need to process the job.
+- `cb` is the callback function that must be called when the job is done.
 
 This callback function accepts an error as the first argument. If an error is provided, the work unit is retried.
 

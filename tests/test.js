@@ -6,6 +6,21 @@ var Jobs   = require('../');
 
 var dbPath = __dirname + '/db';
 
+test('passes job id into worker fn', function(t) {
+  rimraf.sync(dbPath);
+  var db = level(dbPath);
+
+  var queue = Jobs(db, worker);
+  var jobId = queue.push({foo: 'bar'}, t.ifError.bind(t));
+
+  function worker(id, work, cb) {
+    t.equal(id, jobId + '');
+
+    db.once('closed', t.end.bind(t));
+    db.close();
+  };
+});
+
 test('infinite concurrency', function(t) {
 
   rimraf.sync(dbPath);
@@ -24,7 +39,7 @@ test('infinite concurrency', function(t) {
 
   var count = 0;
   var cbs = [];
-  function worker(work, cb) {
+  function worker(id, work, cb) {
     count ++;
     t.equal(work.n, count);
     cbs.push(cb);
@@ -64,7 +79,7 @@ test('concurrency of 1', function(t) {
 
   var count = 0;
   var working = false;
-  function worker(work, cb) {
+  function worker(id, work, cb) {
     t.notOk(working, 'should not be concurrent');
     count ++;
     working = true;
@@ -101,7 +116,7 @@ test('retries on error', function(t) {
 
   var erroredOn = {};
   var count = 0;
-  function worker(work, cb) {
+  function worker(id, work, cb) {
     count ++;
     if (!erroredOn[work.n]) {
       erroredOn[work.n] = true;
@@ -133,7 +148,7 @@ test('emits retry event on retry', function(t) {
     db.close();
   });
 
-  function worker(work, cb) {
+  function worker(id, work, cb) {
     cb(new Error('oops!'));
   };
 
@@ -145,7 +160,7 @@ test('works with no push callback', function(t) {
   var db = level(dbPath);
   var jobs = Jobs(db, worker);
 
-  function worker (payload, done) {
+  function worker (id, payload, done) {
     done();
     process.nextTick(function() {
       db.once('closed', t.end.bind(t));
@@ -161,7 +176,7 @@ test('has exponential backoff in case of error', function(t) {
   var db = level(dbPath);
   var jobs = Jobs(db, worker);
 
-  function worker (payload, done) {
+  function worker (id, payload, done) {
     done(new Error('Oh no!'));
   };
 
@@ -181,7 +196,7 @@ test('can delete job', function(t) {
 
   var processed = 0;
 
-  function worker (payload, done) {
+  function worker (id, payload, done) {
     processed += 1;
     t.ok(processed <= 1, 'worker is not called 2 times');
 
@@ -247,7 +262,7 @@ test('can get read stream', function(t) {
   }
 
 
-  function worker (payload, done) {
+  function worker (id, payload, done) {
     // do nothing
   };
 });
@@ -270,7 +285,7 @@ test('doesn\'t skip past failed tasks', function(t) {
   var erroredOn = {};
   var count = 0;
   var next = 1;
-  function worker(work, cb) {
+  function worker(id, work, cb) {
     // fail every other one
     if (work.n % 2 && !erroredOn[work.n]) {
       erroredOn[work.n] = true;
@@ -311,7 +326,7 @@ test('continues after close and reopen', function(t) {
   }
 
   var count = 0;
-  function worker(work, cb) {
+  function worker(id, work, cb) {
     count++;
     t.equal(work.n, count);
     cb();

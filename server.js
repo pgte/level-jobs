@@ -124,7 +124,7 @@ function flush(q) {
         q._concurrency --;
         q.emit('error', err);
       } else {
-        run(q, JSON.parse(work), ran);
+        run(q, key, JSON.parse(work), ran);
       }
       flush(q);
     }
@@ -151,7 +151,7 @@ function flush(q) {
 
       errorBackoff.on('ready', function() {
         q.emit('retry', err);
-        run(q, JSON.parse(work), ranAgain);
+        run(q, key, JSON.parse(work), ranAgain);
       });
 
       errorBackoff.once('fail', function() {
@@ -170,7 +170,7 @@ function flush(q) {
 
 /// run
 
-function run(q, work, cb) {
-  q._worker(work, cb);
+function run(q, id, work, cb) {
+  q._worker(id, work, cb);
 }
 
