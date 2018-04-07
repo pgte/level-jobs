@@ -46,10 +46,47 @@ Q.push = function push(payload, cb) {
   };
 }
 
+/// pushBatch
+
+Q.pushBatch = function push(payloads, cb) {
+  var q = this;
+  var ids = [];
+
+  var ops = payloads.map(function(payload) {
+    var id = timestamp();
+    ids.push(id)
+    return {
+      type: 'put',
+      key: id,
+      value: stringify(payload)
+    }
+  })
+
+  this._work.batch(ops, batch);
+
+  return ids;
+
+  function batch(err) {
+    if (err) {
+      if (cb) cb(err);
+      else q.emit('error', err);
+    } else if (cb) cb();
+  };
+}
+
 /// del
 
 Q.del = function del(id, cb) {
   this._work.del(id, cb);
+}
+
+/// delBatch
+
+Q.delBatch = function del(ids, cb) {
+  var ops = ids.map(function(id) {
+    return { type: 'del', key: id }
+  })
+  this._work.batch(ops, cb);
 }
 
 Q.pendingStream = function pendingStream(options) {

@@ -94,6 +94,18 @@ var jobId = queue.push(payload, function(err) {
 });
 ```
 
+or in batch:
+```javascript
+var payloads = [
+  {what: 'ever'},
+  {what: 'ever'}
+];
+
+var jobIds = queue.pushBatch(payloads, function(err) {
+  if (err) console.error('Error pushing works into the queue', err.stack);
+});
+```
+
 ### Delete pending job
 
 (Only works for jobs that haven't started yet!)
@@ -101,6 +113,13 @@ var jobId = queue.push(payload, function(err) {
 ```javascript
 queue.del(jobId, function(err) {
   if (err) console.error('Error deleting job', err.stack);
+});
+```
+
+or in batch:
+```javascript
+queue.delBatch(jobIds, function(err) {
+  if (err) console.error('Error deleting jobs', err.stack);
 });
 ```
 
