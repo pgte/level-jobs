@@ -20,8 +20,8 @@ $ npm install level-jobs --save
 ### Create a levelup database
 
 ```javascript
-var levelup = require('levelup');
-var db = levelup('./db')
+var level = require('level');
+var db = level('./db')
 ```
 
 ### Require level-jobs
