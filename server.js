@@ -100,6 +100,7 @@ function flush(q) {
   function poke(err, key, work) {
     q._peeking = false;
     var done = false;
+    var flushDelay = 500;
 
     if (key) {
       q._concurrency ++;
@@ -126,7 +127,10 @@ function flush(q) {
       } else {
         run(q, key, JSON.parse(work), ran);
       }
-      flush(q);
+      const timeoutId = setTimeout(() => {
+          clearTimeout(timeoutId);
+          flush(q);
+      }, flushDelay);
     }
 
     function ran(err) {
@@ -142,7 +146,10 @@ function flush(q) {
 
     function deletedPending(_err) {
       if (err) q.emit('error', _err);
-      flush(q);
+        const timeoutId = setTimeout(() => {
+            clearTimeout(timeoutId);
+            flush(q);
+        }, flushDelay);
     }
 
     function handleRunError(err) {
