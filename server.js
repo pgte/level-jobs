@@ -91,10 +91,14 @@ function maybeFlush(q) {
 /// flush
 
 function flush(q) {
+  var peekDelay = 500;
   if (q._concurrency < q._options.maxConcurrency && ! q._peeking) {
     q._peeking  = true;
     q._flushing = true;
-    peek(q._work, poke);
+    const timeoutId = setTimeout(() => {
+      clearTimeout(timeoutId);
+      peek(q._work, poke);
+    }, flushDelay);
   }
 
   function poke(err, key, work) {
